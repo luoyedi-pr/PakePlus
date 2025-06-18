@@ -15,6 +15,7 @@
     },
     "permissions": [
         "core:default",
+        "notification:default",
         "core:app:allow-default-window-icon",
         "core:app:allow-app-hide",
         "core:app:allow-app-show",
@@ -48,6 +49,7 @@
         "http:allow-fetch-send",
         "dialog:allow-open",
         "os:allow-locale",
+        "os:allow-hostname",
         "clipboard-manager:allow-write-text",
         {
             "identifier": "http:default",
@@ -82,6 +84,7 @@
                 "$DOWNLOAD/**",
                 "$ASSETS/**",
                 "$TEMP/**",
+                "$CACHE/**",
                 "asset://localhost/**"
             ]
         },

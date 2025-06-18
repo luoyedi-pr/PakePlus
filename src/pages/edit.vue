@@ -321,6 +321,7 @@
                         autoCapitalize="off"
                         autoCorrect="off"
                         spellCheck="false"
+                        disabled
                         :rows="3"
                         :placeholder="t('desTips')"
                     />
@@ -353,11 +354,30 @@
                 label-width="auto"
                 style="max-width: 600px"
             >
+                <!-- debug -->
+                <el-form-item label="打包方式">
+                    <el-select
+                        v-model="store.currentProject.desktop.buildMethod"
+                        placeholder="请选择打包方式"
+                        @change="methodChange"
+                    >
+                        <el-option
+                            v-for="item in methodOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                            :disabled="item.disabled"
+                        />
+                    </el-select>
+                </el-form-item>
                 <!-- platform select -->
                 <el-form-item :label="t('pubPlatform')">
                     <el-tree-select
                         v-model="store.currentProject.platform"
                         :data="platData"
+                        :disabled="
+                            store.currentProject.desktop.buildMethod === 'local'
+                        "
                         multiple
                         collapse-tags
                         collapse-tags-tooltip
@@ -382,6 +402,7 @@
                     <el-input
                         v-model="store.currentProject.desktop.pubBody"
                         type="textarea"
+                        disabled
                         autocomplete="off"
                         autoCapitalize="off"
                         autoCorrect="off"
@@ -398,7 +419,7 @@
                     <el-button @click="centerDialogVisible = false">
                         {{ t('cancel') }}
                     </el-button>
-                    <el-button type="primary" @click="publishWeb">
+                    <el-button type="primary" @click="publishCheck">
                         {{ t('confirm') }}
                     </el-button>
                 </div>
@@ -472,8 +493,9 @@ import {
     readTextFile,
     writeTextFile,
     exists,
+    remove,
 } from '@tauri-apps/plugin-fs'
-import { appDataDir, join } from '@tauri-apps/api/path'
+import { appCacheDir, appDataDir, join } from '@tauri-apps/api/path'
 import { basename } from '@tauri-apps/api/path'
 import {
     ArrowLeft,
@@ -517,10 +539,11 @@ import {
     checkLastPublish,
     fileLimitNumber,
 } from '@/utils/common'
-import { platform } from '@tauri-apps/plugin-os'
+import { arch, platform } from '@tauri-apps/plugin-os'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import TauriConfig from '@/components/TauriConfig.vue'
 import ImgPreview from '@/components/ImgPreview.vue'
+import { listen } from '@tauri-apps/api/event'
 
 const route = useRoute()
 const router = useRouter()
@@ -544,6 +567,8 @@ const configDialogVisible = ref(false)
 const codeDialogVisible = ref(false)
 const imgPreviewVisible = ref(false)
 const warning = ref('')
+const platformName = platform()
+const archName = arch()
 
 const appRules = reactive<FormRules>({
     showName: [
@@ -654,7 +679,48 @@ const showWarning = () => {
 const isJson = ref(false)
 const tauriConfigRef = ref<any>(null)
 
-// 发布编译选项
+// build method
+const methodOptions = [
+    {
+        value: 'local',
+        label: '本地打包（仅支持本机系统，大概3分钟）',
+    },
+    {
+        value: 'cloud',
+        label: '云端打包（支持所有主流系统，大概9分钟）',
+    },
+    {
+        value: 'localFast',
+        label: '本地极速（仅支持本机系统，大概1分钟）',
+        disabled: true,
+    },
+    {
+        value: 'cloudFast',
+        label: '云端极速（支持所有主流系统，大概3分钟）',
+        disabled: true,
+    },
+]
+const platformMap: any = {
+    macosaarch64: ['2-2'],
+    macosx86_64: ['2-1'],
+    windowsaarch64: ['1-2'],
+    windowsx86_64: ['1-1'],
+    linuxaarch64: ['3-3'],
+    linuxx86_64: ['3-1', '3-2'],
+}
+
+// method change
+const methodChange = (value: string) => {
+    console.log('methodChange', value, platformName, archName)
+    if (value === 'local') {
+        // 判断本机型号，然后给store.currentProject.platform复制
+        store.currentProject.platform = platformMap[platformName + archName]
+    } else {
+        store.currentProject.platform = ['1-1', '1-2', '2-1', '2-2']
+    }
+}
+
+// build platform
 const platData = [
     {
         value: '1',
@@ -676,7 +742,7 @@ const platData = [
         children: [
             {
                 value: '2-1',
-                label: 'Intel x64',
+                label: 'Intel X64',
             },
             {
                 value: '2-2',
@@ -713,6 +779,28 @@ const platData = [
     //     label: 'iOS',
     //     disabled: true,
     // },
+    {
+        value: '6',
+        label: 'WebPage',
+        disabled: true,
+        children: [
+            {
+                value: '6-1',
+                label: 'GitHub Pages',
+                disabled: true,
+            },
+            {
+                value: '6-2',
+                label: 'Netlify Pages',
+                disabled: true,
+            },
+            {
+                value: '6-3',
+                label: 'Cloudflare Pages',
+                disabled: true,
+            },
+        ],
+    },
 ]
 
 // change app name
@@ -818,9 +906,8 @@ const fileToBase64 = (file: any) => {
 
 // loadHtml
 const loadHtml = async () => {
-    console.log('loadHtml')
     store.currentProject.isHtml = true
-    const selected = await openSelect([])
+    const selected = await openSelect(true, [])
     console.log('selected', selected)
     if (selected) {
         const indexHtml = await join(selected, 'index.html')
@@ -893,9 +980,9 @@ const activeDistInput = async () => {
     if (isTauri) {
         try {
             const res = await invoke('stop_server')
-            console.log('stopServer', res)
+            console.log('activeDistInput stopServer', res)
         } catch (error) {
-            console.error('Failed to stop server:', error)
+            console.error('activeDistInput Failed to stop server:', error)
         }
         loadHtml()
     } else {
@@ -912,14 +999,22 @@ const activeDistInput = async () => {
 const stopServer = async () => {
     if (isTauri) {
         try {
+            const cacheDir = await appCacheDir()
+            const cacheExist = await exists(cacheDir)
+            cacheExist && (await remove(cacheDir, { recursive: true }))
+        } catch (error) {
+            console.error('Failed to remove cache:', error)
+        }
+        try {
             const res = await invoke('stop_server')
-            console.log('stopServer', res)
+            console.log('stop server', res)
         } catch (error) {
             console.error('Failed to stop server:', error)
         }
-        store.actionSecond()
     }
 }
+// close preview window and stop server
+listen('stop_server', stopServer)
 
 // handle file change
 const handleFileChange = async (event: any) => {
@@ -1222,7 +1317,6 @@ const preview = async (resize: boolean) => {
         } catch (error) {
             console.error('Failed to start server:', error)
         }
-        const platformName = platform()
         // get platform
         if (
             platformName === 'windows' &&
@@ -1467,15 +1561,18 @@ const updateTauriConfig = async () => {
     }
 }
 
+// local publish
+const localPublish = async () => {
+    // select save path
+    // download zip
+    // unzip
+    // copy to dist
+    // update config
+    // publish web
+}
+
 // new publish version
 const publishWeb = async () => {
-    if (store.token === '') {
-        oneMessage.error(t('configToken'))
-        return
-    } else if (checkLastPublish()) {
-        oneMessage.error(t('limitProject'))
-        return
-    }
     //  else if (store.currentProject.platform.length === 0) {
     //     oneMessage.error(t('selectPlatform'))
     //     return
@@ -1518,6 +1615,21 @@ const publishWeb = async () => {
             'build error',
             'PakePlus'
         )
+    }
+}
+
+// publish check
+const publishCheck = async () => {
+    if (store.currentProject.desktop.buildMethod === 'local') {
+        localPublish()
+    } else if (store.token === '') {
+        oneMessage.error(t('configToken'))
+        return
+    } else if (checkLastPublish()) {
+        oneMessage.error(t('limitProject'))
+        return
+    } else {
+        publishWeb()
     }
 }
 

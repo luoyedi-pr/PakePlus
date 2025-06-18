@@ -19,8 +19,8 @@
                     <el-sub-menu index="1">
                         <template #title>
                             <el-icon>
-                                <span class="iconfont tauriIcon"
-                                    >&#xe63c;
+                                <span class="iconfont tauriIcon">
+                                    &#xe63c;
                                 </span>
                             </el-icon>
                             <span>Tauri2Api</span>
@@ -116,6 +116,8 @@
                             {{ t('disableCors') }}
                         </el-menu-item>
                         <el-menu-item index="3-14">支付测试</el-menu-item>
+                        <el-menu-item index="3-15">文件压缩</el-menu-item>
+                        <el-menu-item index="3-16">下载资源</el-menu-item>
                     </el-sub-menu>
                     <el-menu-item index="4">
                         <el-icon>
@@ -149,7 +151,7 @@
                 <!-- 图片 -->
                 <img
                     v-if="menuIndex !== '4'"
-                    :src="image"
+                    :src="image || ppIcon"
                     alt="image"
                     class="image"
                 />
@@ -447,12 +449,100 @@
                         and security.
                     </p>
                     <div class="cardBox">
-                        <el-tooltip
-                            content="Get the default window icon."
-                            placement="bottom"
-                        >
-                            <el-button>{{ t('waitDev') }}</el-button>
-                        </el-tooltip>
+                        <el-button @click="openFolder('appCacheDir')">
+                            appCacheDir
+                        </el-button>
+                        <el-button @click="openFolder('appConfigDir')">
+                            appConfigDir
+                        </el-button>
+                        <el-button @click="openFolder('appDataDir')">
+                            appDataDir
+                        </el-button>
+                        <el-button @click="openFolder('appLocalDataDir')">
+                            appLocalDataDir
+                        </el-button>
+                        <el-button @click="openFolder('appLogDir')">
+                            appLogDir
+                        </el-button>
+                        <el-button @click="openFolder('audioDir')">
+                            audioDir
+                        </el-button>
+                        <el-button @click="openFolder('cacheDir')">
+                            cacheDir
+                        </el-button>
+                        <el-button @click="openFolder('configDir')">
+                            configDir
+                        </el-button>
+                        <el-button @click="openFolder('dataDir')">
+                            dataDir
+                        </el-button>
+                        <el-button @click="openFolder('delimiter')">
+                            delimiter
+                        </el-button>
+                        <el-button @click="openFolder('desktopDir')">
+                            desktopDir
+                        </el-button>
+                        <el-button @click="openFolder('dirname')">
+                            dirname
+                        </el-button>
+                        <el-button @click="openFolder('documentDir')">
+                            documentDir
+                        </el-button>
+                        <el-button @click="openFolder('downloadDir')">
+                            downloadDir
+                        </el-button>
+                        <el-button @click="openFolder('executableDir')">
+                            executableDir
+                        </el-button>
+                        <el-button @click="openFolder('extname')">
+                            extname
+                        </el-button>
+                        <el-button @click="openFolder('fontDir')">
+                            fontDir
+                        </el-button>
+                        <el-button @click="openFolder('homeDir')">
+                            homeDir
+                        </el-button>
+                        <el-button @click="openFolder('isAbsolute')">
+                            isAbsolute
+                        </el-button>
+                        <el-button @click="openFolder('join')">
+                            join
+                        </el-button>
+                        <el-button @click="openFolder('localDataDir')">
+                            localDataDir
+                        </el-button>
+                        <el-button @click="openFolder('normalize')">
+                            normalize
+                        </el-button>
+                        <el-button @click="openFolder('pictureDir')">
+                            pictureDir
+                        </el-button>
+                        <el-button @click="openFolder('publicDir')">
+                            publicDir
+                        </el-button>
+                        <el-button @click="openFolder('resolve')">
+                            resolve
+                        </el-button>
+                        <el-button @click="openFolder('resolveResource')">
+                            resolveResource
+                        </el-button>
+                        <el-button @click="openFolder('resourceDir')">
+                            resourceDir
+                        </el-button>
+                        <el-button @click="openFolder('runtimeDir')">
+                            runtimeDir
+                        </el-button>
+                        <el-button @click="openFolder('sep')"> sep </el-button>
+                        <el-button @click="openFolder('tempDir')">
+                            tempDir
+                        </el-button>
+                        <el-button @click="openFolder('templateDir')">
+                            templateDir
+                        </el-button>
+                        <el-button @click="openFolder('videoDir')">
+                            videoDir
+                        </el-button>
                     </div>
                 </div>
                 <!-- api/tray -->
@@ -522,35 +612,22 @@
                         </el-tooltip>
                     </div>
                 </div>
-                <!-- api/template -->
-                <div v-else-if="menuIndex === '1-111'" class="cardContent">
-                    <h1 class="cardTitle">menu</h1>
-                    <p>
-                        The menu system allows you to create and manage menus
-                        for your application. This package is also accessible
-                        with window.__TAURI__.menu when app.withGlobalTauri in
-                        tauri.conf.json is set to true.
-                    </p>
-                    <div class="cardBox">
-                        <el-tooltip
-                            content="Get the default window icon."
-                            placement="bottom"
-                        >
-                            <el-button>{{ t('waitDev') }}</el-button>
-                        </el-tooltip>
-                    </div>
-                </div>
                 <!-- 关于 -->
                 <div v-else-if="menuIndex === '4'" class="cardContent">
                     <About />
                 </div>
                 <!-- 支付测试 -->
                 <div v-else-if="menuIndex === '3-14'" class="cardContent">
+                    <h1 class="cardTitle">pay method</h1>
+                    <p>provide pay method</p>
                     <el-button @click="getPayCode('weixin')">
-                        微信支付
+                        weixin pay
                     </el-button>
                     <el-button @click="getPayCode('alipay')">
-                        支付宝支付
+                        ali pay
+                    </el-button>
+                    <el-button @click="getPayCode('alipay')">
+                        paypal
                     </el-button>
                     <div v-if="qrCodeData" class="qrCodeBox">
                         <img
@@ -574,6 +651,188 @@
                         </div>
                     </div>
                 </div>
+                <!-- plugin-os api -->
+                <div v-else-if="menuIndex === '2-14'" class="cardContent">
+                    <h1 class="cardTitle">plugin-os</h1>
+                    <p>
+                        Provides operating system-related utility methods and
+                        properties.
+                    </p>
+                    <div class="cardBox">
+                        <el-tooltip
+                            content="Returns the current operating system architecture."
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('arch')"
+                                >arch()</el-button
+                            >
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Returns the operating system-specific end-of-line marker."
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('eol')">eol()</el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Returns the file extension, if any, used for executable binaries on this platform"
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('exeExtension')">
+                                exeExtension()
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Returns the current operating system family."
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('family')">
+                                family()
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Returns the host name of the operating system."
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('hostname')">
+                                hostname()
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Returns a String with a BCP-47 language tag inside"
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('locale')">
+                                locale()
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Returns a string describing the specific operating system in use"
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('platform')">
+                                platform()
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Returns the current operating system type"
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('type')">
+                                type()
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Returns the current operating system version."
+                            placement="bottom"
+                        >
+                            <el-button @click="osApis('version')">
+                                version()
+                            </el-button>
+                        </el-tooltip>
+                    </div>
+                </div>
+                <!-- api/文件解压缩 -->
+                <div v-else-if="menuIndex === '3-15'" class="cardContent">
+                    <h1 class="cardTitle">文件解压缩</h1>
+                    <p>对文件或文件夹进行压缩或者解压缩处理</p>
+                    <div class="cardBox">
+                        <el-tooltip
+                            content="Get the default window icon."
+                            placement="bottom"
+                        >
+                            <el-button @click="selectFolder">
+                                输出目录
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Get the default window icon."
+                            placement="bottom"
+                        >
+                            <el-button @click="compressFile">
+                                压缩文件
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Get the default window icon."
+                            placement="bottom"
+                        >
+                            <el-button @click="decompressFile">
+                                解压文件
+                            </el-button>
+                        </el-tooltip>
+                    </div>
+                </div>
+                <!-- api/下载文件 -->
+                <div v-else-if="menuIndex === '3-16'" class="cardContent">
+                    <h1 class="cardTitle">下载文件</h1>
+                    <p>
+                        下载网络链接文件到本地，支持多文件下载，以及下载进度回调
+                    </p>
+                    <div class="cardBox">
+                        <el-tooltip
+                            content="Get the default window icon."
+                            placement="bottom"
+                        >
+                            <el-button @click="selectDownloadFolder">
+                                选择文件夹
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Get the default window icon."
+                            placement="bottom"
+                        >
+                            <el-button @click="downFile">下载文件</el-button>
+                        </el-tooltip>
+                        <el-tooltip
+                            content="Get the default window icon."
+                            placement="bottom"
+                        >
+                            <el-button @click="downFile(false)">
+                                默认下载到Download目录
+                            </el-button>
+                        </el-tooltip>
+                        <el-progress
+                            type="circle"
+                            :percentage="downloadProgress"
+                        />
+                    </div>
+                </div>
+                <!-- api/notification -->
+                <div v-else-if="menuIndex === '2-12'" class="cardContent">
+                    <h1 class="cardTitle">notification</h1>
+                    <p>
+                        Send native notifications to your user using the
+                        notification plugin.
+                    </p>
+                    <div class="cardBox">
+                        <el-tooltip
+                            content="Get the default window icon."
+                            placement="bottom"
+                        >
+                            <el-button @click="sendNotification">
+                                发送消息通知
+                            </el-button>
+                        </el-tooltip>
+                    </div>
+                </div>
+                <!-- api/template -->
+                <div v-else-if="menuIndex === '1-111'" class="cardContent">
+                    <h1 class="cardTitle">menu</h1>
+                    <p>
+                        The menu system allows you to create and manage menus
+                        for your application. This package is also accessible
+                        with window.__TAURI__.menu when app.withGlobalTauri in
+                        tauri.conf.json is set to true.
+                    </p>
+                    <div class="cardBox">
+                        <el-tooltip
+                            content="Get the default window icon."
+                            placement="bottom"
+                        >
+                            <el-button>{{ t('waitDev') }}</el-button>
+                        </el-tooltip>
+                    </div>
+                </div>
                 <!-- 待开发 -->
                 <div v-else class="waitContent">
                     <h1 class="cardTitle">{{ t('waitDev') }}</h1>
@@ -585,8 +844,9 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
+import ppIcon from '@/assets/images/pakeplus.png'
 import { useRoute, useRouter } from 'vue-router'
-import { getPaySign, oneMessage } from '@/utils/common'
+import { getPaySign, oneMessage, openSelect, openUrl } from '@/utils/common'
 import About from '@/pages/about.vue'
 import {
     InfoFilled,
@@ -662,7 +922,10 @@ import {
     join, // 拼接多个路径片段
     normalize, // 规范化路径（解析 `.` 和 `..`）
     resolve, // 解析绝对路径（基于当前工作目录）
-    isAbsolute, // 检查路径是否为绝对路径
+    isAbsolute,
+    localDataDir,
+    resolveResource,
+    tempDir, // 检查路径是否为绝对路径
 } from '@tauri-apps/api/path'
 import { TrayIcon } from '@tauri-apps/api/tray'
 import {
@@ -675,14 +938,27 @@ import { useI18n } from 'vue-i18n'
 import payApi from '@/apis/pay'
 import { fetch } from '@tauri-apps/plugin-http'
 import QRCode from 'qrcode'
+import {
+    arch,
+    eol,
+    exeExtension,
+    family,
+    hostname,
+    locale,
+    platform,
+    type,
+    version,
+} from '@tauri-apps/plugin-os'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+
 const textarea = ref('')
 const image = ref()
 const defaultMenu = ref('1-1')
 const menuIndex = ref('1-1')
+let selectedDir = ''
 
 const handleMenu = (index: string) => {
     console.log('handleMenu', index)
@@ -781,6 +1057,49 @@ const openWindow = async () => {
     console.log('window')
 }
 
+// os function
+const osApis = async (func: string) => {
+    switch (func) {
+        case 'arch':
+            const archName = arch()
+            textarea.value = 'arch:' + archName
+            break
+        case 'eol':
+            textarea.value = 'eol:' + eol()
+            break
+        case 'exeExtension':
+            const exeExt = exeExtension()
+            textarea.value = 'exeExtension:' + exeExt
+            break
+        case 'family':
+            const familyName = family()
+            textarea.value = 'family:' + familyName
+            break
+        case 'hostname':
+            const hostName = await hostname()
+            textarea.value = 'hostname:' + hostName
+            break
+        case 'locale':
+            const localeName = await locale()
+            textarea.value = 'locale:' + localeName
+            break
+        case 'platform':
+            const platformName = platform()
+            textarea.value = 'platform:' + platformName
+            break
+        case 'type':
+            const typeName = type()
+            textarea.value = 'type:' + typeName
+            break
+        case 'version':
+            const versionName = version()
+            textarea.value = 'version:' + versionName
+            break
+        default:
+            break
+    }
+}
+
 const qrCodeData = ref('')
 const payType = ref('')
 // get pay code
@@ -822,6 +1141,255 @@ const getPayCode = async (payMathod: string = 'weixin') => {
     console.log('url', url)
     qrCodeData.value = url
 }
+
+// 选择文件夹
+const selectFolder = async () => {
+    const selected = await openSelect(true, [])
+    console.log('selected', selected)
+    textarea.value = selected || ''
+}
+
+// 压缩文件
+const compressFile = async () => {
+    console.log('compressFile')
+    const selected = await openSelect(true, [])
+    console.log('selected', selected)
+    const destinationFile = await join(textarea.value, 'compressed.zip')
+    if (selected && textarea.value) {
+        const files = await invoke('compress_folder', {
+            source: selected,
+            destination: destinationFile,
+        })
+        console.log('compress_folder', files)
+        oneMessage.success('压缩文件成功')
+    } else {
+        oneMessage.error('请选择压缩文件或输出文件夹')
+    }
+}
+
+// 解压文件
+const decompressFile = async () => {
+    console.log('decompressFile')
+    const selected = await openSelect(false, [])
+    console.log('selected', selected)
+    if (selected && textarea.value) {
+        const files = await invoke('decompress_file', {
+            source: selected,
+            destination: textarea.value,
+        })
+        console.log('decompress_file', files)
+        oneMessage.success('解压文件成功')
+    } else {
+        oneMessage.error('请选择解压文件或输出文件夹')
+    }
+}
+
+// 选择下载文件夹
+const selectDownloadFolder = async () => {
+    const selected = await openSelect(true, [])
+    console.log('selected', selected)
+    selectedDir = selected || ''
+}
+
+// Send native notifications to your user using the notification plugin.
+const sendNotification = async () => {
+    if (!textarea.value) {
+        oneMessage.error('请输入通知内容')
+        return
+    }
+    invoke('notification', {
+        params: {
+            title: 'PakePlus通知API',
+            body: textarea.value,
+            icon: 'face-smile',
+        },
+    })
+}
+
+// 打开默认文件夹
+const openFolder = async (dirType: string) => {
+    switch (dirType) {
+        case 'appCacheDir':
+            const appCacheDirPath = await appCacheDir()
+            console.log('appCacheDirPath', appCacheDirPath)
+            await openUrl(appCacheDirPath)
+            break
+        case 'appConfigDir':
+            const appConfigDirPath = await appConfigDir()
+            await openUrl(appConfigDirPath)
+            break
+        case 'appDataDir':
+            const appDataDirPath = await appDataDir()
+            await openUrl(appDataDirPath)
+            break
+        case 'appLocalDataDir':
+            const appLocalDataDirPath = await appLocalDataDir()
+            await openUrl(appLocalDataDirPath)
+            break
+        case 'appLogDir':
+            const appLogDirPath = await appLogDir()
+            await openUrl(appLogDirPath)
+            break
+        case 'audioDir':
+            const audioDirPath = await audioDir()
+            await openUrl(audioDirPath)
+            break
+        case 'cacheDir':
+            const cacheDirPath = await cacheDir()
+            await openUrl(cacheDirPath)
+            break
+        case 'configDir':
+            const configDirPath = await configDir()
+            await openUrl(configDirPath)
+            break
+        case 'dataDir':
+            const dataDirPath = await dataDir()
+            await openUrl(dataDirPath)
+            break
+        case 'delimiter':
+            const delimiterPath = await delimiter()
+            textarea.value = 'delimiter: ' + delimiterPath
+            break
+        case 'desktopDir':
+            const desktopDirPath = await desktopDir()
+            await openUrl(desktopDirPath)
+            break
+        case 'dirname':
+            const dirnamePath = await dirname(textarea.value)
+            await openUrl(dirnamePath)
+            break
+        case 'documentDir':
+            const documentsDirPath = await documentDir()
+            await openUrl(documentsDirPath)
+            break
+        case 'downloadDir':
+            const downloadDirPath = await downloadDir()
+            await openUrl(downloadDirPath)
+            break
+        case 'executableDir':
+            const executableDirPath = await executableDir()
+            await openUrl(executableDirPath)
+            break
+        case 'extname':
+            const extnamePath = await extname(textarea.value)
+            await openUrl(extnamePath)
+            break
+        case 'fontDir':
+            const fontDirPath = await fontDir()
+            await openUrl(fontDirPath)
+            break
+        case 'homeDir':
+            const homeDirPath = await homeDir()
+            await openUrl(homeDirPath)
+            break
+        case 'isAbsolute':
+            const isAbsolutePath = await isAbsolute(textarea.value)
+            textarea.value = 'isAbsolute: ' + isAbsolutePath
+            break
+        case 'join':
+            const joinPath = await join(textarea.value, 'test.txt')
+            await openUrl(joinPath)
+            break
+        case 'localDataDir':
+            const localDataDirPath = await localDataDir()
+            await openUrl(localDataDirPath)
+            break
+        case 'normalize':
+            const normalizePath = await normalize(textarea.value)
+            await openUrl(normalizePath)
+            break
+        case 'pictureDir':
+            const pictureDirPath = await pictureDir()
+            await openUrl(pictureDirPath)
+            break
+        case 'publicDir':
+            const publicDirPath = await publicDir()
+            await openUrl(publicDirPath)
+            break
+        case 'resolve':
+            const resolvePath = await resolve(textarea.value)
+            await openUrl(resolvePath)
+            break
+        case 'resolveResource':
+            const resolveResourcePath = await resolveResource(textarea.value)
+            await openUrl(resolveResourcePath)
+            break
+        case 'resourceDir':
+            const resourceDirPath = await resourceDir()
+            await openUrl(resourceDirPath)
+            break
+        case 'runtimeDir':
+            const runtimeDirPath = await runtimeDir()
+            await openUrl(runtimeDirPath)
+            break
+        case 'sep':
+            const sepPath = sep()
+            textarea.value = 'sep: ' + sepPath
+            break
+        case 'tempDir':
+            const tempDirPath = await tempDir()
+            await openUrl(tempDirPath)
+            break
+        case 'templateDir':
+            const tmpDirPath = await templateDir()
+            await openUrl(tmpDirPath)
+            break
+        case 'videoDir':
+            const videoDirPath = await videoDir()
+            await openUrl(videoDirPath)
+            break
+        default:
+            textarea.value = '检查出错'
+            break
+    }
+}
+
+// 下载到appdata目录
+const downAppData = async () => {
+    const url = textarea.value
+    const fileName = await basename(url)
+    const fileId = fileName.split('.')[0]
+    const appDataDirPath = await appDataDir()
+    const savePath = await join(appDataDirPath, fileName)
+    await invoke('download_file', {
+        url,
+        savePath,
+        fileId,
+    })
+}
+
+// 下载文件
+const downloadProgress = ref(0)
+const downFile = async (selPath: boolean = true) => {
+    downloadProgress.value = 0
+    if (!textarea.value) {
+        oneMessage.error('请输入下载地址或选择下载文件夹')
+        return
+    }
+    const url = textarea.value
+    const fileName = await basename(url)
+    const fileId = fileName.split('.')[0]
+    let savePath = ''
+    if (selPath) {
+        savePath = await join(selectedDir, fileName)
+    } else {
+        console.log('download dir')
+    }
+    await invoke('download_file', {
+        url,
+        savePath,
+        fileId,
+    })
+}
+
+listen('download_progress', (event: any) => {
+    console.log(`downloading fileId--- ${event.payload.fileId}`)
+    console.log(`downloading downloaded--- ${event.payload.downloaded}`)
+    console.log(`downloading total--- ${event.payload.total}`)
+    downloadProgress.value = Number(
+        ((event.payload.downloaded / event.payload.total) * 100).toFixed(2)
+    )
+})
 
 // 页面初始化
 onMounted(() => {
@@ -883,10 +1451,10 @@ onMounted(() => {
             font-size: 14px;
         }
 
-        // .image {
-        //     width: 40px;
-        //     height: 40px;
-        // }
+        .image {
+            width: 40px;
+            height: 40px;
+        }
 
         .backBtn {
             width: 60px;
